@@ -1,0 +1,151 @@
+﻿@page "{id:Guid}"   
+<!--We are accepting id parameter,and it's name it's same as in pagemodel class-->
+@model BlogWebApp.Pages.Admin.BlogPosts.EditModel
+
+<div class="bg-secondary bg-opacity-10 py-2 mb-5" >
+    <div class="container">
+        <h1>Edit Blog post</h1>
+    </div>    
+</div>
+<partial name="_Notification"></partial>
+
+@if (Model.BlogPost != null)
+{ <div>
+    <div class="container"> 
+        <form method="post">
+                <div class="form-group">
+                        <label for="heading">Id</label>
+                        <input type="text" class="form-control" id="id"  asp-for="@Model.BlogPost.Id" readonly required>
+                        <span class="text-danger" asp-validation-for="@Model.BlogPost.Id"></span>
+                </div>
+                <div class="form-group">
+                    <label for="heading">Heading</label>
+                    <input type="text" class="form-control" id="heading"  asp-for="@Model.BlogPost.Heading" required>
+                    <span class="text-danger" asp-validation-for="@Model.BlogPost.Heading"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="pageTitle">Page Title</label>
+                    <input type="text" class="form-control" id="pageTitle" asp-for="@Model.BlogPost.PageTitle" required>
+                    <span class="text-danger" asp-validation-for="@Model.BlogPost.PageTitle"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="content">Content</label>
+                    <textarea class="form-control" id="content"asp-for="@Model.BlogPost.Content" required></textarea>
+                    <span class="text-danger" asp-validation-for="@Model.BlogPost.Content"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="shortDescription">Short Description</label>
+                    <input type="text" class="form-control" id="shortDescription" asp-for="@Model.BlogPost.ShortDescription" required>
+                    <span class="text-danger" asp-validation-for="@Model.BlogPost.ShortDescription"></span>
+                </div>
+
+                
+                <div class="mb-3">
+                     <label for="featuredImageUpload" class="form-label">Featured Image Upload</label>
+                     <input type="file" id="featuredImageUpload" asp-for="@Model.FeaturedImage"/>
+                     @if(@Model.BlogPost.FeaturedImageUrl!=null)
+                    {
+                         <img src="@Model.BlogPost.FeaturedImageUrl" id="featuredImageDisplay" style="width:300px;"/>
+                    }
+                    else
+                    {  
+                        <img src="Model.BlogPost.FeaturedImageUrl" id="featuredImageDisplay" style="display:none; width:300px;"/>
+                    }
+                                  
+                </div>  
+
+
+
+                <div class="form-group">
+                    <label for="featuredImageUrl">Featured Image Url</label>
+                    <input type="text" class="form-control" id="featuredImageUrl"asp-for="@Model.BlogPost.FeaturedImageUrl" required>
+                    <span class="text-danger" asp-validation-for="@Model.BlogPost.FeaturedImageUrl"></span>
+                </div>
+                             
+                <div class="form-group">
+                    <label for="urlHandle">Url Handle</label>
+                    <input type="text" class="form-control" id="urlHandle" asp-for="@Model.BlogPost.UrlHandle" required>
+                    <span class="text-danger" asp-validation-for="@Model.BlogPost.UrlHandle"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="publishedDate">Published Date</label>
+                    <input type="date" class="form-control" id="publishedDate"asp-for="@Model.BlogPost.PublishedDate" required>
+                    <span class="text-danger" asp-validation-for="@Model.BlogPost.PublishedDate"></span>
+                </div>
+                <div class="form-group">
+                    <label for="author">Author</label>
+                    <input type="text" class="form-control" id="author" asp-for="@Model.BlogPost.Author" required>
+                    <span class="text-danger" asp-validation-for="@Model.BlogPost.Author"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"> Tags (comma separated)</label>
+                    <input type="text" id="tags" class="form-control" asp-for="@Model.Tags" required>
+                    <span class="text-danger" asp-validation-for="@Model.Tags" ></span>
+                </div>
+
+
+                <div class="form-check mb-3">
+                  <input class="form-check-input" type="checkbox" id="isVisible" asp-for="@Model.BlogPost.Visible">
+                  <label class="form-check-label" for="isVisible">
+                      Is Visible
+                  </label>
+                </div>
+                 <div class="mb-3">
+                    <button class="btn btn-primary" type="submit" asp-page-handler="Edit">Submit</button>
+                    <button class="btn btn-danger" type="submit" asp-page-handler="Delete">Delete</button>
+                </div>
+
+
+
+
+        </form>
+    </div>
+    </div>
+}
+else
+{
+   <div class="container">
+       <p>Blog Post Not Found!</p>
+   </div>
+}
+@section Scripts {
+    <script>
+        var editor=new FroalaEditor('#content',{
+        imageUploadURL:'/api/images'
+        })
+
+        const featuredImageUploadElement=document.getElementById('featuredImageUpload');
+        const featuredImageUrl=document.getElementById('featuredImageUrl');
+        const featuredImageDisplay=document.getElementById('featuredImageDisplay');
+
+      async function uploadFeaturedImage(e)
+        {
+            console.log(e.target.files[0]);
+            let data= new FormData();
+            data.append('file',e.target.files[0]);
+
+            await fetch('/api/images',{
+                method:'POST',
+                headers:{
+                         'Accept':'*/*',
+                },
+                body:data
+            }).then(response=>response.json())
+              .then(result=>{
+                  featuredImageUrl.value=result.link;
+                  featuredImageDisplay.style.display="block";
+                  featuredImageDisplay.src=result.link;
+              });
+            
+        }
+
+
+        featuredImageUploadElement.addEventListener('change',uploadFeaturedImage)
+    </script>
+}
+

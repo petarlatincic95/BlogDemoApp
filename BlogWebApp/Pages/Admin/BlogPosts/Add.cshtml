@@ -1,0 +1,126 @@
+﻿@page
+@model BlogWebApp.Pages.Admin.BlogPosts.AddModel
+
+
+<div class="bg-secondary bg-opacity-10 py-2 mb-5" >
+    <div class="container">
+        <h1>Add Blog post</h1>
+    </div>    
+</div>
+
+
+<div>
+    <div class="container"> 
+        <form method="post">
+                <div class="form-group">
+                    <label for="heading">Heading</label>
+                    <input type="text" class="form-control" id="heading"  asp-for="@Model.AddBlogPostRequest.Heading" required/>
+                    <span class="text-danger" asp-validation-for="@Model.AddBlogPostRequest.Heading"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="pageTitle">Page Title</label>
+                    <input type="text" class="form-control" id="pageTitle" asp-for="@Model.AddBlogPostRequest.PageTitle" required/>
+                    <span class="text-danger" asp-validation-for="@Model.AddBlogPostRequest.PageTitle"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="content">Content</label>
+                    <textarea class="form-control" id="content"asp-for="@Model.AddBlogPostRequest.Content" required></textarea>
+                    <span class="text-danger" asp-validation-for="@Model.AddBlogPostRequest.Content"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="shortDescription">Short Description</label>
+                    <input type="text" class="form-control" id="shortDescription" asp-for="@Model.AddBlogPostRequest.ShortDescription" required/>
+                    <span class="text-danger" asp-validation-for="@Model.AddBlogPostRequest.ShortDescription"></span>
+                </div>
+
+
+                <div class="mb-3">
+                     <label for="featuredImageUpload" class="form-label">Featured Image Upload</label>
+                     <input type="file" id="featuredImageUpload" asp-for="@Model.FeaturedImage">
+                     <img src="" id="featuredImageDisplay" style="display:none; width:300px;"/>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="featuredImageUrl">Featured Image Url</label>
+                    <input type="text" class="form-control" id="featuredImageUrl"asp-for="@Model.AddBlogPostRequest.FeaturedImageUrl" required/>
+                    <span class="text-danger" asp-validation-for="@Model.AddBlogPostRequest.FeaturedImageUrl"></span>
+                </div>
+                             
+                <div class="form-group">
+                    <label for="urlHandle">Url Handle</label>
+                    <input type="text" class="form-control" id="urlHandle" asp-for="@Model.AddBlogPostRequest.UrlHandle" required/>
+                    <span class="text-danger" asp-validation-for="@Model.AddBlogPostRequest.UrlHandle"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="publishedDate">Published Date</label>
+                    <input type="date" class="form-control" id="publishedDate"asp-for="@Model.AddBlogPostRequest.PublishedDate" required/>
+                    <span class="text-danger" asp-validation-for="@Model.AddBlogPostRequest.PublishedDate"></span>
+                </div>
+                <div class="form-group">
+                    <label for="author">Author</label>
+                    <input type="text" class="form-control" id="author" asp-for="@Model.AddBlogPostRequest.Author" required/>
+                    <span class="text-danger" asp-validation-for="@Model.AddBlogPostRequest.Author"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label for="" class="form-label">Tags (comma separators)</label>
+                    <input type="text" clss="form-control" id="tags" asp-for="@Model.Tags" required/>
+                    <span class="text-danger" asp-validation-for="@Model.Tags"></span>
+                </div>
+                <div class="form-check mb-3">
+                  <input class="form-check-input" type="checkbox" id="isVisible" asp-for="@Model.AddBlogPostRequest.Visible">
+                  <label class="form-check-label" for="isVisible">
+                      Is Visible
+                  </label>
+                </div>
+
+                 <div class="mb-3">
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                </div>
+
+
+
+
+        </form>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        var editor=new FroalaEditor('#content',{
+        imageUploadURL:'/api/images'
+        })
+
+        const featuredImageUploadElement=document.getElementById('featuredImageUpload');
+        const featuredImageUrl=document.getElementById('featuredImageUrl');
+        const featuredImageDisplay=document.getElementById('featuredImageDisplay');
+
+      async function uploadFeaturedImage(e)
+        {
+            console.log(e.target.files[0]);
+            let data= new FormData();
+            data.append('file',e.target.files[0]);
+
+            await fetch('/api/images',{
+                method:'POST',
+                headers:{
+                         'Accept':'*/*',
+                },
+                body:data
+            }).then(response=>response.json())
+              .then(result=>{
+                  featuredImageUrl.value=result.link;
+                  featuredImageDisplay.style.display="block";
+                  featuredImageDisplay.src=result.link;
+              });
+            
+        }
+
+
+        featuredImageUploadElement.addEventListener('change',uploadFeaturedImage)
+    </script>
+  }
